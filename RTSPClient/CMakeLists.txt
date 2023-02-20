@@ -3,7 +3,7 @@
 #
 
 # Добавьте источник в исполняемый файл этого проекта.
-add_executable (RTSPClient "RTSPClient.cpp")
+add_executable (RTSPClient "src/RTSPClient.cpp" "src/include/TCPConnection.h" "src/TCPConnection.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET RTSPClient PROPERTY CXX_STANDARD 20)
