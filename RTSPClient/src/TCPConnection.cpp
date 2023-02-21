@@ -7,32 +7,36 @@ namespace aaa
         _sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (_sock == INVALID_SOCKET) {
             wprintf(L"socket function failed with error: %ld\n", WSAGetLastError());
+            return;
         }
 
-        sockaddr_in clientService;
         _service.sin_family = AF_INET;
         _service.sin_addr.s_addr = inet_addr(ip.c_str());
         _service.sin_port = htons(port);
 
         int iResult = connect(_sock, (SOCKADDR*)&_service, sizeof(_service));
         if (iResult == SOCKET_ERROR) {
+            _isConnected = false;
             wprintf(L"connect function failed with error: %ld\n", WSAGetLastError());
             iResult = closesocket(_sock);
             if (iResult == SOCKET_ERROR)
                 wprintf(L"closesocket function failed with error: %ld\n", WSAGetLastError());
+            return;
         }
+
+        _isConnected = true;
 	}
 
 	TCPConnection::~TCPConnection()
 	{
-        int iResult = closesocket(_sock);
-        if (iResult == SOCKET_ERROR) {
-            wprintf(L"closesocket function failed with error: %ld\n", WSAGetLastError());
-        }
+        Close();
 	}
 
 	char* TCPConnection::Send(const char* buff) const
 	{
+        if (!_isConnected)
+            return nullptr;
+
         int iResult = send(_sock, buff, (int)strlen(buff), 0);
         if (iResult == SOCKET_ERROR) {
             wprintf(L"send failed with error: %d\n", WSAGetLastError());
@@ -45,7 +49,7 @@ namespace aaa
             closesocket(_sock);
         }
 
-        char* recvbuf = new char[MAX_BUFF_SIZE];
+        char* recvbuf = new char[MAX_BUFF_SIZE] {'\0'};
 
         do {
 
@@ -53,7 +57,6 @@ namespace aaa
             if (iResult > 0)
             {
                 wprintf(L"Bytes received: %d\n", iResult);
-                printf("Message:\n%s\n", recvbuf);
             }
             else if (iResult == 0)
                 wprintf(L"Connection closed\n");
@@ -64,4 +67,17 @@ namespace aaa
 
 		return recvbuf;
 	}
+
+    bool TCPConnection::Close()
+    {
+        if (!_isConnected)
+            return false;
+        int iResult = closesocket(_sock);
+        if (iResult == SOCKET_ERROR) {
+            wprintf(L"closesocket function failed with error: %ld\n", WSAGetLastError());
+            return false;
+        }
+        _isConnected = false;
+        return true;
+    }
 }
