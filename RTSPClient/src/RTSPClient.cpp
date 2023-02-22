@@ -20,9 +20,12 @@ int main()
 
     char* answer;
 
-    answer = conn.Send("OPTIONS rtsp://127.0.0.1/live/jpeg RTSP/1.0\r\nCSeq: 1\r\nUser-Agent: Agent 007");
-    //answer = conn.Send("DESCRIBE rtsp://127.0.0.1:554/live RTSP/1.0\r\nCSeq: 1\r\nAccept: application/sdp\r\nUser-Agent: Agent 007");
-
+    answer = conn.Send("DESCRIBE rtsp://127.0.0.1/live RTSP/1.0\r\nCSeq: 1\r\nAccept: application/sdp\r\nUser-Agent: Agent 007\r\n");
+    
+    printf("Message:\n%s\n", answer);
+    delete[] answer;
+    
+    answer = conn.Send("OPTIONS rtsp://127.0.0.1/live/jpeg RTSP/1.0\r\nCSeq: 2\r\nUser-Agent: Agent 007\r\n");
     printf("Message:\n%s", answer);
 
     conn.Close();

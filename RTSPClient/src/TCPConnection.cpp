@@ -43,27 +43,27 @@ namespace aaa
             closesocket(_sock);
         }
 
-        iResult = shutdown(_sock, SD_SEND);
+        /*iResult = shutdown(_sock, SD_SEND);
         if (iResult == SOCKET_ERROR) {
             wprintf(L"shutdown failed with error: %d\n", WSAGetLastError());
             closesocket(_sock);
-        }
+        }*/
 
         char* recvbuf = new char[MAX_BUFF_SIZE] {'\0'};
 
-        do {
+        
 
-            iResult = recv(_sock, recvbuf, MAX_BUFF_SIZE, 0);
-            if (iResult > 0)
-            {
-                wprintf(L"Bytes received: %d\n", iResult);
-            }
-            else if (iResult == 0)
-                wprintf(L"Connection closed\n");
-            else
-                wprintf(L"recv failed with error: %d\n", WSAGetLastError());
+        iResult = recv(_sock, recvbuf, MAX_BUFF_SIZE, 0);
+        if (iResult > 0)
+        {
+            wprintf(L"Bytes received: %d\n", iResult);
+        }
+        else if (iResult == 0)
+            wprintf(L"Connection closed\n");
+        else
+            wprintf(L"recv failed with error: %d\n", WSAGetLastError());
 
-        } while (iResult > 0);
+        
 
 		return recvbuf;
 	}
