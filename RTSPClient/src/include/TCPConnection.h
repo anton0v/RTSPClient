@@ -9,7 +9,7 @@ namespace aaa
 	class TCPConnection
 	{
 	public:
-		TCPConnection(const std::string ip, const int port);
+		TCPConnection(const std::string &ip, const int port);
 		~TCPConnection();
 		bool IsConnected() const { return _isConnected; }
 		char* Send(const char* buff) const;

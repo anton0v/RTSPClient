@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <WinSock2.h>
 #include "include/TCPConnection.h"
+#include "include/SDP.h"
 
 #pragma warning(disable:4996)
 #pragma comment(lib, "ws2_32.lib")
@@ -23,6 +24,11 @@ int main()
     answer = conn.Send("DESCRIBE rtsp://127.0.0.1/live RTSP/1.0\r\nCSeq: 1\r\nAccept: application/sdp\r\nUser-Agent: Agent 007\r\n");
     
     printf("Message:\n%s\n", answer);
+
+    std::string sdpString(answer);
+
+    aaa::SDP spd(sdpString);
+
     delete[] answer;
     
     answer = conn.Send("OPTIONS rtsp://127.0.0.1/live/jpeg RTSP/1.0\r\nCSeq: 2\r\nUser-Agent: Agent 007\r\n");

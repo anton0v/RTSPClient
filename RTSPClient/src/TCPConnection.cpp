@@ -2,7 +2,7 @@
 
 namespace aaa
 {
-	TCPConnection::TCPConnection(const std::string ip, const int port)
+	TCPConnection::TCPConnection(const std::string &ip, const int port)
 	{
         _sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (_sock == INVALID_SOCKET) {
