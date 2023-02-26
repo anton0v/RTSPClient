@@ -23,16 +23,21 @@ int main()
 
     answer = conn.Send("DESCRIBE rtsp://127.0.0.1/live RTSP/1.0\r\nCSeq: 1\r\nAccept: application/sdp\r\nUser-Agent: Agent 007\r\n");
     
-    printf("Message:\n%s\n", answer);
+    if (answer != nullptr)
+    {
+        printf("Message:\n%s\n", answer);
 
-    std::string sdpString(answer);
+        std::string sdpString(answer);
 
-    aaa::SDP spd(sdpString);
+        aaa::SDP sdp(sdpString);
 
-    delete[] answer;
-    
-    answer = conn.Send("OPTIONS rtsp://127.0.0.1/live/jpeg RTSP/1.0\r\nCSeq: 2\r\nUser-Agent: Agent 007\r\n");
-    printf("Message:\n%s", answer);
+        const std::vector<aaa::MediaInfo>& info = sdp.GetMedia();
+
+        for (int i = 0; i < info.size(); i++)
+        {
+            printf("Name:%s\r\nPort:%d\r\n", info[i].name.c_str(), info[i].port);
+        }
+    }
 
     conn.Close();
 
