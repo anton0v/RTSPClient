@@ -32,12 +32,12 @@ namespace aaa
         Close();
     }
 
-    char* UDPConnection::Recieve() const
+    std::string UDPConnection::Recieve() const
     {
         if (!_isOpen)
-            return nullptr;
+            return std::string();
 
-        char* recvbuf = new char[MAX_BUFF_SIZE] {'\0'};
+        char recvbuf[MAX_BUFF_SIZE] {'\0'};
 
         sockaddr other;
         int otherSize = sizeof(other);
@@ -52,7 +52,7 @@ namespace aaa
         else
             std::cout << "recv failed with error: " << WSAGetLastError() << std::endl;
 
-        return recvbuf;
+        return std::string(recvbuf);
     }
 
     bool UDPConnection::Close()

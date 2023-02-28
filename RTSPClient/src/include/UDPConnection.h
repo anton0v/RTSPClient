@@ -3,7 +3,7 @@
 #include <string>
 #include <WinSock2.h>
 
-#define MAX_BUFF_SIZE 2000
+#define MAX_BUFF_SIZE 50000
 
 namespace aaa
 {
@@ -13,7 +13,7 @@ namespace aaa
 		UDPConnection(const std::string& ip, const int port);
 		~UDPConnection();
 		bool IsOpen() const { return _isOpen; }
-		char* Recieve() const;
+		std::string Recieve() const;
 		bool Close();
 	private:
 		SOCKET _sock;

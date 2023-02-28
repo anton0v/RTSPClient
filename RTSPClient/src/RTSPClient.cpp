@@ -77,16 +77,11 @@ int main()
 
     aaa::UDPConnection mediaData("127.0.0.1", info[0].port == 0 ? RTP_PORT : info[0].port);
 
-    char* buff = new char[500];
-    buff = mediaData.Recieve();
-
-    if (buff == nullptr)
+    do
     {
-        WSACleanup();
-        return 1;
-    }
-
-    std::cout << "Data:\n[" << buff << "]\n";
+        answer.assign(mediaData.Recieve());
+        //std::cout << "Data:\n[" << answer << "]\n";
+    } while (!answer.empty());
 
     answer = conn.Send("TEARDOWN rtsp://127.0.0.1/live RTSP/1.0\r\n"
         "CSeq: 4\r\n"
