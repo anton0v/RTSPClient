@@ -15,7 +15,7 @@ namespace aaa
         _service.sin_addr.s_addr = inet_addr(ip.c_str());
         _service.sin_port = htons(port);
 
-        int iResult = connect(_sock, (SOCKADDR*)&_service, sizeof(_service));
+        int iResult = bind(_sock, (struct sockaddr*)&_service, sizeof(_service));
         if (iResult == SOCKET_ERROR) {
             std::cout << "connect function failed with error: " << WSAGetLastError() << std::endl;
             iResult = closesocket(_sock);

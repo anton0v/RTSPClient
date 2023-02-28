@@ -3,7 +3,7 @@
 #include <string>
 #include <WinSock2.h>
 
-#define MAX_BUFF_SIZE 500
+#define MAX_BUFF_SIZE 2000
 
 namespace aaa
 {

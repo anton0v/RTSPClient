@@ -44,7 +44,7 @@ int main()
         printf("Name:%s\r\nPort:%d\r\n", info[i].name.c_str(), info[i].port);
     }
 
-    answer = conn.Send("SETUP rtsp://127.0.0.1/live RTSP/1.0\r\n"
+    answer = conn.Send("SETUP rtsp://127.0.0.1/live/track0 RTSP/1.0\r\n"
         "CSeq: 2\r\n"
         "Transport: RTP/AVP;unicast;client_port=1124-1125\r\n"
         "User-Agent: Agent 007\r\n");
@@ -57,11 +57,15 @@ int main()
 
     std::cout << "Message:\n" << answer << std::endl;
 
-    answer = conn.Send("PLAY rtsp://127.0.0.1/live RTSP/1.0\r\n"
-        "CSeq: 3\r\n"
-        "Session: 1\r\n"
-        "Range: npt = 0.000 -\r\n"
+    std::string session = answer.substr(answer.find("Session"));
+    session.erase(session.find('\r\n') + 1);
+    answer.assign("PLAY rtsp://127.0.0.1/live/track0 RTSP/1.0\r\n"
+        "CSeq: 3\r\n");
+    answer.append(session);
+    answer.append("Range: npt = 0.000 -\r\n"
         "User-Agent: Agent 007\r\n");
+
+    answer = conn.Send(answer.c_str());
 
     if (answer.empty())
     {
@@ -82,7 +86,7 @@ int main()
         return 1;
     }
 
-    std::cout << "Data:\n" << buff << std::endl;
+    std::cout << "Data:\n[" << buff << "]\n";
 
     answer = conn.Send("TEARDOWN rtsp://127.0.0.1/live RTSP/1.0\r\n"
         "CSeq: 4\r\n"
@@ -98,6 +102,7 @@ int main()
     std::cout << "Message:\n" << answer << std::endl;
 
     conn.Close();
+    mediaData.Close();
 
     WSACleanup();
     return 0;
