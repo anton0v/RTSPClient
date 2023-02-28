@@ -21,18 +21,17 @@ int main()
 
     aaa::TCPConnection conn("127.0.0.1", RTSP_PORT);
 
-    char* answer;
+    std::string answer;
 
     answer = conn.Send("DESCRIBE rtsp://127.0.0.1/live RTSP/1.0\r\nCSeq: 1\r\nAccept: application/sdp\r\nUser-Agent: Agent 007\r\n");
     
-    if (answer == nullptr)
+    if (answer.empty())
     {
         WSACleanup();
-        delete[] answer;
         return 1;
     }
 
-    printf("Message:\n%s\n", answer);
+    std::cout << "Message:\n" << answer << std::endl;
 
     std::string sdpString(answer);
 
@@ -45,24 +44,18 @@ int main()
         printf("Name:%s\r\nPort:%d\r\n", info[i].name.c_str(), info[i].port);
     }
 
-    delete[] answer;
-
     answer = conn.Send("SETUP rtsp://127.0.0.1/live RTSP/1.0\r\n"
         "CSeq: 2\r\n"
         "Transport: RTP/AVP;unicast;client_port=1124-1125\r\n"
-        "Session: 1\r\n"
         "User-Agent: Agent 007\r\n");
 
-    if (answer == nullptr)
+    if (answer.empty())
     {
         WSACleanup();
-        delete[] answer;
         return 1;
     }
 
-    printf("Message:\n%s\n", answer);
-
-    delete[] answer;
+    std::cout << "Message:\n" << answer << std::endl;
 
     answer = conn.Send("PLAY rtsp://127.0.0.1/live RTSP/1.0\r\n"
         "CSeq: 3\r\n"
@@ -70,51 +63,43 @@ int main()
         "Range: npt = 0.000 -\r\n"
         "User-Agent: Agent 007\r\n");
 
-    if (answer == nullptr)
+    if (answer.empty())
     {
         WSACleanup();
-        delete[] answer;
         return 1;
     }
 
-    printf("Message:\n%s\n", answer);
+    std::cout << "Message:\n" << answer << std::endl;
 
     aaa::UDPConnection mediaData("127.0.0.1", info[0].port == 0 ? RTP_PORT : info[0].port);
 
-    delete[] answer;
+    char* buff = new char[500];
+    buff = mediaData.Recieve();
 
-    answer = mediaData.Recieve();
-
-    if (answer == nullptr)
+    if (buff == nullptr)
     {
         WSACleanup();
-        delete[] answer;
         return 1;
     }
 
-    printf("Data:\n%s\n", answer);
-
-    delete[] answer;
+    std::cout << "Data:\n" << buff << std::endl;
 
     answer = conn.Send("TEARDOWN rtsp://127.0.0.1/live RTSP/1.0\r\n"
         "CSeq: 4\r\n"
         "Session: 1\r\n"
         "User-Agent: Agent 007\r\n");
 
-    if (answer == nullptr)
+    if (answer.empty())
     {
         WSACleanup();
-        delete[] answer;
         return 1;
     }
 
-    printf("Message:\n%s\n", answer);
+    std::cout << "Message:\n" << answer << std::endl;
 
     conn.Close();
 
     WSACleanup();
-
-    delete[] answer;
     return 0;
 }
 

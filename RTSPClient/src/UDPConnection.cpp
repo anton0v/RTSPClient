@@ -7,7 +7,7 @@ namespace aaa
 	{
         _sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
         if (_sock == INVALID_SOCKET) {
-            wprintf(L"socket function failed with error: %ld\n", WSAGetLastError());
+            std::cout << "socket function failed with error: " << WSAGetLastError() << std::endl;
             return;
         }
 
@@ -17,10 +17,10 @@ namespace aaa
 
         int iResult = connect(_sock, (SOCKADDR*)&_service, sizeof(_service));
         if (iResult == SOCKET_ERROR) {
-            wprintf(L"connect function failed with error: %ld\n", WSAGetLastError());
+            std::cout << "connect function failed with error: " << WSAGetLastError() << std::endl;
             iResult = closesocket(_sock);
             if (iResult == SOCKET_ERROR)
-                wprintf(L"closesocket function failed with error: %ld\n", WSAGetLastError());
+                std::cout << "closesocket function failed with error: " << WSAGetLastError() << std::endl;
             return;
         }
 
@@ -39,15 +39,18 @@ namespace aaa
 
         char* recvbuf = new char[MAX_BUFF_SIZE] {'\0'};
 
-        int iResult = recv(_sock, recvbuf, MAX_BUFF_SIZE, 0);
+        sockaddr other;
+        int otherSize = sizeof(other);
+
+        int iResult = recvfrom(_sock, recvbuf, MAX_BUFF_SIZE, 0, &other, &otherSize);
         if (iResult > 0)
         {
-            wprintf(L"Bytes received: %d\n", iResult);
+            std::cout << "Bytes received: " << iResult << std::endl;
         }
         else if (iResult == 0)
-            wprintf(L"Connection closed\n");
+            std::cout << "Connection closed\n" << std::endl;
         else
-            wprintf(L"recv failed with error: %d\n", WSAGetLastError());
+            std::cout << "recv failed with error: " << WSAGetLastError() << std::endl;
 
         return recvbuf;
     }
@@ -58,7 +61,7 @@ namespace aaa
             return false;
         int iResult = closesocket(_sock);
         if (iResult == SOCKET_ERROR) {
-            wprintf(L"closesocket function failed with error: %ld\n", WSAGetLastError());
+            std::cout << "closesocket function failed with error: " << WSAGetLastError() << std::endl;
             return false;
         }
         _isOpen = false;

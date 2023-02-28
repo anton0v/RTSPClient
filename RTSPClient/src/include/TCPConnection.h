@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <string>
 #include <WinSock2.h>
 
@@ -12,7 +13,7 @@ namespace aaa
 		TCPConnection(const std::string &ip, const int port);
 		~TCPConnection();
 		bool IsConnected() const { return _isConnected; }
-		char* Send(const char* buff) const;
+		std::string Send(const char* buff) const;
 		bool Close();
 	private:
 		SOCKET _sock;
