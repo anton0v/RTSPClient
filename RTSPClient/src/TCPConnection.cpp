@@ -2,7 +2,8 @@
 
 namespace aaa
 {
-	TCPConnection::TCPConnection(const std::string &ip, const int port)
+	TCPConnection::TCPConnection(const char* ip, const int port)
+        : Connection(ip, port)
 	{
         _sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (_sock == INVALID_SOCKET) {
@@ -10,13 +11,9 @@ namespace aaa
             return;
         }
 
-        _service.sin_family = AF_INET;
-        _service.sin_addr.s_addr = inet_addr(ip.c_str());
-        _service.sin_port = htons(port);
-
         int iResult = connect(_sock, (SOCKADDR*)&_service, sizeof(_service));
         if (iResult == SOCKET_ERROR) {
-            _isConnected = false;
+            _isOpen = false;
             std::cout << "connect function failed with error: " << WSAGetLastError() << std::endl;
             iResult = closesocket(_sock);
             if (iResult == SOCKET_ERROR)
@@ -24,28 +21,27 @@ namespace aaa
             return;
         }
 
-        _isConnected = true;
+        _isOpen = true;
 	}
 
-	TCPConnection::~TCPConnection()
+    void TCPConnection::Send(const char* buff, int size) const
 	{
-        Close();
-	}
+        if (!_isOpen)
+            return;
 
-    std::string TCPConnection::Send(const char* buff) const
-	{
-        if (!_isConnected)
-            return std::string();
-
-        int iResult = send(_sock, buff, (int)strlen(buff), 0);
+        int iResult = send(_sock, buff, size, 0);
         if (iResult == SOCKET_ERROR) {
             std::cout << "send failed with error: " << WSAGetLastError() << std::endl;
             closesocket(_sock);
         }
+	}
 
-        char recvbuf[MAX_BUFF_SIZE]{'\0'};
+    void TCPConnection::Recieve(char* buff, int size) const
+    {
+        if (!_isOpen)
+            return;
 
-        iResult = recv(_sock, recvbuf, MAX_BUFF_SIZE, 0);
+        int iResult = recv(_sock, buff, size, 0);
         if (iResult > 0)
         {
             std::cout << "Bytes received: " << iResult << std::endl;
@@ -54,20 +50,5 @@ namespace aaa
             std::cout << "Connection closed\n" << std::endl;
         else
             std::cout << "recv failed with error: " << WSAGetLastError() << std::endl;
-
-		return std::string(recvbuf);
-	}
-
-    bool TCPConnection::Close()
-    {
-        if (!_isConnected)
-            return false;
-        int iResult = closesocket(_sock);
-        if (iResult == SOCKET_ERROR) {
-            std::cout << "closesocket function failed with error: " << WSAGetLastError() << std::endl;
-            return false;
-        }
-        _isConnected = false;
-        return true;
     }
 }

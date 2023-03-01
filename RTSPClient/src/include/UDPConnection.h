@@ -1,23 +1,14 @@
 #pragma once
-#include <iostream>
-#include <string>
-#include <WinSock2.h>
-
-#define MAX_BUFF_SIZE 50000
+#include "Connection.h"
 
 namespace aaa
 {
-	class UDPConnection
+	class UDPConnection : public Connection
 	{
 	public:
-		UDPConnection(const std::string& ip, const int port);
-		~UDPConnection();
-		bool IsOpen() const { return _isOpen; }
-		std::string Recieve() const;
-		bool Close();
-	private:
-		SOCKET _sock;
-		sockaddr_in _service;
-		bool _isOpen;
+		UDPConnection(const char* ip, const int port);
+		~UDPConnection() {};
+		void Send(const char* buff, int size) const override;
+		void Recieve(char* buff, int size) const override;
 	};
 }

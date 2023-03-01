@@ -1,23 +1,14 @@
 #pragma once
-#include <iostream>
-#include <string>
-#include <WinSock2.h>
-
-#define MAX_BUFF_SIZE 500
+#include "Connection.h"
 
 namespace aaa
 {
-	class TCPConnection
+	class TCPConnection : public Connection
 	{
 	public:
-		TCPConnection(const std::string &ip, const int port);
-		~TCPConnection();
-		bool IsConnected() const { return _isConnected; }
-		std::string Send(const char* buff) const;
-		bool Close();
-	private:
-		SOCKET _sock;
-		sockaddr_in _service;
-		bool _isConnected;
+		TCPConnection(const char* ip, const int port);
+		~TCPConnection() {};
+		void Send(const char* buff, int size) const override;
+		void Recieve(char* buff, int size) const override;
 	};
 }

@@ -1,11 +1,14 @@
 ﻿#include <iostream>
 #include <WinSock2.h>
+#include "include/Connection.h"
 #include "include/TCPConnection.h"
 #include "include/UDPConnection.h"
 #include "include/SDP.h"
 
 #pragma warning(disable:4996)
 #pragma comment(lib, "ws2_32.lib")
+
+#define BUFF_SIZE 5000
 
 #define RTSP_PORT 554
 #define RTP_PORT 1124
@@ -19,11 +22,20 @@ int main()
         return 1;
     }
 
+    char buff[BUFF_SIZE] {'\0'};
+
     aaa::TCPConnection conn("127.0.0.1", RTSP_PORT);
 
     std::string answer;
 
-    answer = conn.Send("DESCRIBE rtsp://127.0.0.1/live RTSP/1.0\r\nCSeq: 1\r\nAccept: application/sdp\r\nUser-Agent: Agent 007\r\n");
+    conn.Send("DESCRIBE rtsp://127.0.0.1/live RTSP/1.0\r\n"
+        "CSeq: 1\r\n"
+        "Accept: application/sdp\r\n"
+        "User-Agent: Agent 007\r\n",
+        1000);
+
+    conn.Recieve(buff, BUFF_SIZE);
+    answer.assign(buff);
     
     if (answer.empty())
     {
@@ -44,10 +56,14 @@ int main()
         printf("Name:%s\r\nPort:%d\r\n", info[i].name.c_str(), info[i].port);
     }
 
-    answer = conn.Send("SETUP rtsp://127.0.0.1/live/track0 RTSP/1.0\r\n"
+    conn.Send("SETUP rtsp://127.0.0.1/live/track0 RTSP/1.0\r\n"
         "CSeq: 2\r\n"
         "Transport: RTP/AVP;unicast;client_port=1124-1125\r\n"
-        "User-Agent: Agent 007\r\n");
+        "User-Agent: Agent 007\r\n",
+        1000);
+
+    conn.Recieve(buff, 1000);
+    answer.assign(buff);
 
     if (answer.empty())
     {
@@ -65,7 +81,10 @@ int main()
     answer.append("Range: npt = 0.000 -\r\n"
         "User-Agent: Agent 007\r\n");
 
-    answer = conn.Send(answer.c_str());
+    conn.Send(answer.c_str(), BUFF_SIZE);
+
+    conn.Recieve(buff, BUFF_SIZE);
+    answer.assign(buff);
 
     if (answer.empty())
     {
@@ -79,14 +98,19 @@ int main()
 
     do
     {
-        answer.assign(mediaData.Recieve());
+        mediaData.Recieve(buff, BUFF_SIZE);
+        answer.assign(buff);
         //std::cout << "Data:\n[" << answer << "]\n";
     } while (!answer.empty());
 
-    answer = conn.Send("TEARDOWN rtsp://127.0.0.1/live RTSP/1.0\r\n"
+    conn.Send("TEARDOWN rtsp://127.0.0.1/live RTSP/1.0\r\n"
         "CSeq: 4\r\n"
         "Session: 1\r\n"
-        "User-Agent: Agent 007\r\n");
+        "User-Agent: Agent 007\r\n",
+        BUFF_SIZE);
+
+    conn.Recieve(buff, BUFF_SIZE);
+    answer.assign(buff);
 
     if (answer.empty())
     {
