@@ -31,8 +31,7 @@ int main()
     conn.Send("DESCRIBE rtsp://127.0.0.1/live RTSP/1.0\r\n"
         "CSeq: 1\r\n"
         "Accept: application/sdp\r\n"
-        "User-Agent: Agent 007\r\n",
-        1000);
+        "User-Agent: Agent 007\r\n");
 
     conn.Recieve(buff, BUFF_SIZE);
     answer.assign(buff);
@@ -58,11 +57,10 @@ int main()
 
     conn.Send("SETUP rtsp://127.0.0.1/live/track0 RTSP/1.0\r\n"
         "CSeq: 2\r\n"
-        "Transport: RTP/AVP;unicast;client_port=1124-1125\r\n"
-        "User-Agent: Agent 007\r\n",
-        1000);
+        "Transport: RTP/AVP;unicast;client_port=1124-1125\r\n");
 
-    conn.Recieve(buff, 1000);
+    memset(buff, '\0', BUFF_SIZE);
+    conn.Recieve(buff, BUFF_SIZE);
     answer.assign(buff);
 
     if (answer.empty())
@@ -81,8 +79,9 @@ int main()
     answer.append("Range: npt = 0.000 -\r\n"
         "User-Agent: Agent 007\r\n");
 
-    conn.Send(answer.c_str(), BUFF_SIZE);
+    conn.Send(answer.c_str());
 
+    memset(buff, '\0', BUFF_SIZE);
     conn.Recieve(buff, BUFF_SIZE);
     answer.assign(buff);
 
@@ -98,6 +97,7 @@ int main()
 
     do
     {
+        memset(buff, '\0', BUFF_SIZE);
         mediaData.Recieve(buff, BUFF_SIZE);
         answer.assign(buff);
         //std::cout << "Data:\n[" << answer << "]\n";
@@ -106,9 +106,9 @@ int main()
     conn.Send("TEARDOWN rtsp://127.0.0.1/live RTSP/1.0\r\n"
         "CSeq: 4\r\n"
         "Session: 1\r\n"
-        "User-Agent: Agent 007\r\n",
-        BUFF_SIZE);
+        "User-Agent: Agent 007\r\n");
 
+    memset(buff, '\0', BUFF_SIZE);
     conn.Recieve(buff, BUFF_SIZE);
     answer.assign(buff);
 

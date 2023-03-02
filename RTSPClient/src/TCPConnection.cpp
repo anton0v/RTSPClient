@@ -24,12 +24,12 @@ namespace aaa
         _isOpen = true;
 	}
 
-    void TCPConnection::Send(const char* buff, int size) const
+    void TCPConnection::Send(const char* buff) const
 	{
         if (!_isOpen)
             return;
 
-        int iResult = send(_sock, buff, size, 0);
+        int iResult = send(_sock, buff, (int)strlen(buff), 0);
         if (iResult == SOCKET_ERROR) {
             std::cout << "send failed with error: " << WSAGetLastError() << std::endl;
             closesocket(_sock);

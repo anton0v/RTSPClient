@@ -8,7 +8,7 @@ namespace aaa
 	public:
 		UDPConnection(const char* ip, const int port);
 		~UDPConnection() {};
-		void Send(const char* buff, int size) const override;
+		void Send(const char* buff) const override;
 		void Recieve(char* buff, int size) const override;
 	};
 }

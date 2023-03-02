@@ -23,7 +23,7 @@ namespace aaa
         _isOpen = true;
 	}
 
-    void UDPConnection::Send(const char* buff, int size) const
+    void UDPConnection::Send(const char* buff) const
     {
         //to do
     }
