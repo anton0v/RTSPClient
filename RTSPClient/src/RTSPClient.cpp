@@ -1,5 +1,7 @@
 ﻿#include <iostream>
 #include <WinSock2.h>
+#include <atomic>
+#include <thread>
 #include "include/Connection.h"
 #include "include/TCPConnection.h"
 #include "include/UDPConnection.h"
@@ -12,6 +14,28 @@
 
 #define RTSP_PORT 554
 #define RTP_PORT 1124
+
+std::atomic<bool> exitFlag(false);
+
+void simpleRTP(int port)
+{
+    aaa::UDPConnection mediaData("127.0.0.1", port == 0 ? RTP_PORT : port);
+
+    char buff[BUFF_SIZE]{ '\0' };
+
+    do
+    {
+        memset(buff, '\0', BUFF_SIZE);
+        mediaData.Recieve(buff, BUFF_SIZE);
+    } while (!exitFlag);
+
+    mediaData.Close();
+}
+
+void simpleRTCP()
+{
+
+}
 
 int main()
 {
@@ -93,15 +117,15 @@ int main()
 
     std::cout << "Message:\n" << answer << std::endl;
 
-    aaa::UDPConnection mediaData("127.0.0.1", info[0].port == 0 ? RTP_PORT : info[0].port);
+    std::thread RTP(simpleRTP, info[0].port);
 
-    do
-    {
-        memset(buff, '\0', BUFF_SIZE);
-        mediaData.Recieve(buff, BUFF_SIZE);
-        answer.assign(buff);
-        //std::cout << "Data:\n[" << answer << "]\n";
-    } while (!answer.empty());
+    int a;
+
+    std::cin >> a;
+
+    exitFlag = true;
+
+    RTP.join();
 
     conn.Send("TEARDOWN rtsp://127.0.0.1/live RTSP/1.0\r\n"
         "CSeq: 4\r\n"
@@ -121,7 +145,6 @@ int main()
     std::cout << "Message:\n" << answer << std::endl;
 
     conn.Close();
-    mediaData.Close();
 
     WSACleanup();
     return 0;
